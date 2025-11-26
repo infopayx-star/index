@@ -1,81 +1,301 @@
-y# Sample workflow for building and deploying a Next.js site to GitHub Pages
-#
-# To get started with Next.js see: https://nextjs.org/docs/getting-started
-#
-name: Deploy Next.js site to Pages
-
-on:
-  # Runs on pushes targeting the default branch
-  push:
-    branches: ["main"]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
-jobs:
-  # Build job
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Detect package manager
-        id: detect-package-manager
-        run: |
-          if [ -f "${{ github.workspace }}/yarn.lock" ]; then
-            echo "manager=yarn" >> $GITHUB_OUTPUT
-            echo "command=install" >> $GITHUB_OUTPUT
-            echo "runner=yarn" >> $GITHUB_OUTPUT
-            exit 0
-          elif [ -f "${{ github.workspace }}/package.json" ]; then
-            echo "manager=npm" >> $GITHUB_OUTPUT
-            echo "command=ci" >> $GITHUB_OUTPUT
-            echo "runner=npx --no-install" >> $GITHUB_OUTPUT
-            exit 0
-          else
-            echo "Unable to determine package manager"
-            exit 1
-          fi
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: ${{ steps.detect-package-manager.outputs.manager }}
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-        with:
-          # Automatically inject basePath in your Next.js configuration file and disable
-          # server side image optimization (https://nextjs.org/docs/api-reference/next/image#unoptimized).
-          #
-          # You may remove this line if you want to manage the configuration yourself.
-          static_site_generator: next
-      - name: Restore cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            .next/cache
-          # Generate a new cache whenever packages or source files change.
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
-          # If source files changed but packages didn't, rebuild from a prior cache.
-          restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-
-      - name: Install dependencies
-        run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
-      - name: Build with Next.js
-        run: ${{ steps.detect-package-manager.outputs.runner }} next build
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./out
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Follow Buttons</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .subtitle {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .social-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .social-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 20px;
+            border-radius: 12px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .social-button i {
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .social-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .social-button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .social-button:hover::after {
+            transform: translateX(0);
+        }
+        
+        .facebook {
+            background: linear-gradient(135deg, #3b5998, #4a6fba);
+        }
+        
+        .twitter {
+            background: linear-gradient(135deg, #1da1f2, #3ab6f3);
+        }
+        
+        .instagram {
+            background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
+            background-size: 200% 200%;
+            animation: gradient 3s ease infinite;
+        }
+        
+        .youtube {
+            background: linear-gradient(135deg, #ff0000, #ff4d4d);
+        }
+        
+        .linkedin {
+            background: linear-gradient(135deg, #0077b5, #00a0dc);
+        }
+        
+        .tiktok {
+            background: linear-gradient(135deg, #010101, #69c9d0, #ee1d52);
+        }
+        
+        .pinterest {
+            background: linear-gradient(135deg, #bd081c, #e60023);
+        }
+        
+        .all-button {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .follow-all {
+            background: linear-gradient(135deg, #ff8a00, #e52e71);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+        }
+        
+        .follow-all i {
+            margin-right: 10px;
+            font-size: 1.3rem;
+        }
+        
+        .follow-all:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 40px;
+        }
+        
+        .instructions h2 {
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .instructions p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .social-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Follow Us on Social Media</h1>
+        <p class="subtitle">Stay connected with our latest updates and content</p>
+        
+        <div class="social-grid">
+            <a href="#" class="social-button facebook">
+                <i class="fab fa-facebook-f"></i>
+                Follow on Facebook
+            </a>
+            
+            <a href="#" class="social-button twitter">
+                <i class="fab fa-twitter"></i>
+                Follow on Twitter
+            </a>
+            
+            <a href="#" class="social-button instagram">
+                <i class="fab fa-instagram"></i>
+                Follow on Instagram
+            </a>
+            
+            <a href="#" class="social-button youtube">
+                <i class="fab fa-youtube"></i>
+                Subscribe on YouTube
+            </a>
+            
+            <a href="#" class="social-button linkedin">
+                <i class="fab fa-linkedin-in"></i>
+                Follow on LinkedIn
+            </a>
+            
+            <a href="#" class="social-button tiktok">
+                <i class="fab fa-tiktok"></i>
+                Follow on TikTok
+            </a>
+            
+            <a href="#" class="social-button pinterest">
+                <i class="fab fa-pinterest-p"></i>
+                Follow on Pinterest
+            </a>
+        </div>
+        
+        <div class="all-button">
+            <button class="follow-all">
+                <i class="fas fa-plus"></i>
+                Follow All Platforms
+            </button>
+        </div>
+        
+        <div class="instructions">
+            <h2>How to Add These Buttons to Your Website</h2>
+            <p>1. Copy the HTML structure of the buttons you want to use</p>
+            <p>2. Replace the href="#" with your actual social media profile URLs</p>
+            <p>3. Include Font Awesome for the icons: &lt;link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"&gt;</p>
+            <p>4. Customize colors and styles to match your brand</p>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click event to "Follow All" button
+            const followAllButton = document.querySelector('.follow-all');
+            followAllButton.addEventListener('click', function() {
+                const socialButtons = document.querySelectorAll('.social-button');
+                
+                // Animate each button with a delay
+                socialButtons.forEach((button, index) => {
+                    setTimeout(() => {
+                        button.style.transform = 'scale(1.1)';
+                        button.style.boxShadow = '0 0 20px rgba(255, 255, 255, 0.7)';
+                        
+                        setTimeout(() => {
+                            button.style.transform = '';
+                            button.style.boxShadow = '';
+                        }, 500);
+                    }, index * 150);
+                });
+                
+                // Show a confirmation message
+                alert('Opening all social media profiles in new tabs. In a real implementation, this would open each platform in a new tab.');
+            });
+            
+            // Add hover effects to social buttons
+            const socialButtons = document.querySelectorAll('.social-button');
+            socialButtons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = '';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
